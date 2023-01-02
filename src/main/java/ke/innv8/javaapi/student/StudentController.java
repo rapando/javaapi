@@ -16,12 +16,12 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Student> getStudents() {
         return studentService.getStudents();
     }
 
-    @RequestMapping(value="/", method = RequestMethod.POST)
+    @RequestMapping(value="", method = RequestMethod.POST)
     public void registerNewStudent(@RequestBody Student student) {
         studentService.addNewStudent(student);
     }

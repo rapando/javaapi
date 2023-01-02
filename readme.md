@@ -10,3 +10,11 @@ Run in development
 ```shell
 mvn spring-boot:run
 ```
+
+To deploy
+
+```shell
+mvn clean install
+docker build -t javaapi .
+docker run -p 5000:5000 javaapi
+```
