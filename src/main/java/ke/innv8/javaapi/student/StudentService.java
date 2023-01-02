@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 // make it a bean (so it can be autowired) - asing auto instantiated
@@ -44,14 +46,39 @@ public class StudentService {
 
     @Transactional
     public void updateStudent(Long id, Student studentDetails) {
-        Optional<Student> studentById = studentRepository.findById(id);
-        if (!studentById.isPresent()) {
-            throw new IllegalStateException("student with id " + id + " does not exist");
+        Student student = studentRepository.findById(id).orElseThrow(() -> new IllegalStateException(
+                "student with id " + id + " does not exist"
+        ));
+
+        if (
+                studentDetails.getName() != null &&
+                        studentDetails.getName().length() > 0 &&
+                        !Objects.equals(studentDetails.getName(), student.getName())
+        ) {
+            student.setName(studentDetails.getName());
         }
-        Student student = studentById.get();
-        student.setName(studentDetails.getName());
-        student.setDob(studentDetails.getDob());
-        student.setEmail(studentDetails.getEmail());
+
+        if (
+                studentDetails.getEmail() != null &&
+                        studentDetails.getEmail().length() > 0 &&
+                        !Objects.equals(studentDetails.getEmail(), student.getEmail())
+        ) {
+
+            // also check if the email has already been taken
+            Optional<Student> studentOptional = studentRepository.findStudentByEmail(studentDetails.getEmail());
+            if (studentOptional.isPresent()) {
+                throw new IllegalStateException("email taken");
+            }
+            student.setEmail(studentDetails.getEmail());
+        }
+
+        if (
+                studentDetails.getDob() != null
+        ) {
+
+            student.setDob(studentDetails.getDob());
+        }
+
         studentRepository.save(student);
     }
 }
