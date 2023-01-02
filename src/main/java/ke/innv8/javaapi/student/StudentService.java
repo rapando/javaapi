@@ -1,10 +1,11 @@
 package ke.innv8.javaapi.student;
 
 import jakarta.transaction.Transactional;
+import ke.innv8.javaapi.exceptions.EmailTakenException;
+import ke.innv8.javaapi.exceptions.StudentIdDoesNotExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public class StudentService {
     public void addNewStudent(Student student) {
         Optional<Student> studentOptional = studentRepository.findStudentByEmail(student.getEmail());
         if (studentOptional.isPresent()) {
-            throw new IllegalStateException("email taken");
+            throw new EmailTakenException(student.getEmail());
         }
 
         // if the email does not exist, create
@@ -39,16 +40,18 @@ public class StudentService {
     public void deleteStudent(Long id) {
         boolean exists = studentRepository.existsById(id);
         if (!exists) {
-            throw new IllegalStateException("student with id " + id + " does not exist");
+            throw new StudentIdDoesNotExistException(id);
         }
         studentRepository.deleteById(id);
     }
 
     @Transactional
     public void updateStudent(Long id, Student studentDetails) {
-        Student student = studentRepository.findById(id).orElseThrow(() -> new IllegalStateException(
-                "student with id " + id + " does not exist"
-        ));
+        Student student = studentRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new StudentIdDoesNotExistException(id)
+                );
 
         if (
                 studentDetails.getName() != null &&
@@ -67,7 +70,7 @@ public class StudentService {
             // also check if the email has already been taken
             Optional<Student> studentOptional = studentRepository.findStudentByEmail(studentDetails.getEmail());
             if (studentOptional.isPresent()) {
-                throw new IllegalStateException("email taken");
+                throw new EmailTakenException(studentDetails.getEmail());
             }
             student.setEmail(studentDetails.getEmail());
         }

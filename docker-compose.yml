@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb:10.9.4
+    restart: unless-stopped
+    environment:
+      - MARIADB_USER=root
+      - MARIADB_PASSWORD=root
+      - MARIADB_ROOT_PASSWORD=root
+      - MARIADB_DATABASE=java_api
+    expose:
+      - 3306
+
+  javaapi:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
