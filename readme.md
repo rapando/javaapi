@@ -15,6 +15,6 @@ To deploy
 
 ```shell
 mvn clean install
-docker build -t javaapi .
-docker run -p 5000:5000 javaapi
 ```
+
+You can then deploy the `target/javaapi-0.0.1-SNAPSHOT.jar`
